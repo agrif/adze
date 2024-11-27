@@ -1,0 +1,23 @@
+[workspace]
+
+members = [".", "tool"]
+default-members = [".", "tool"]
+
+[package]
+name = "adze"
+version = "0.1.0"
+edition = "2021"
+
+authors = ["Aaron Griffith <aargri@gmail.com>"]
+
+[dependencies]
+arrayvec = "0.7"
+bounded-integer = { version = "0.5", features = ["types"] }
+enum-tools = "0.5"
+thiserror = "2"
+
+[dev-dependencies]
+anyhow = "1"
+derive-quickcheck-arbitrary = "0.1"
+quickcheck = "1"
+quickcheck_macros = "1"
