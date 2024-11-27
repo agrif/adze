@@ -1,0 +1,66 @@
+name: Generate Documentation
+
+on:
+  workflow_run:
+    workflows: [Test]
+    types: [completed]
+    branches: [main]
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    name: Generate
+    runs-on: ubuntu-latest
+
+    # only run if test succeeded
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo doc
+
+      - run: |
+          echo '
+          <!DOCTYPE HTML>
+          <html lang="en-US">
+            <head>
+              <meta charset="UTF-8">
+              <meta http-equiv="refresh" content="0; url=adze/">
+              <script type="text/javascript">
+                window.location.href = "adze/"
+              </script>
+              <title>Page Redirection</title>
+            </head>
+            <body>
+            If you are not redirected automatically, follow this <a href="adze/">this link</a>.
+            </body>
+          </html>' > target/doc/index.html
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: target/doc/
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: generate
+
+    # only run if test succeeded
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - uses: actions/configure-pages@v5
+      - uses: actions/deploy-pages@v4
+        id: deployment
