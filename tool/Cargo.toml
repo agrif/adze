@@ -12,7 +12,3 @@ clap = { version = "4", features = ["derive", "wrap_help"] }
 pcap-file = "2"
 pretty-hex = "0.4"
 weak-table = "0.3"
-
-[[bin]]
-name = "adze"
-path = "src/main.rs"
